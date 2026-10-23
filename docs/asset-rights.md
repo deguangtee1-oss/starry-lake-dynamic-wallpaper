@@ -1,11 +1,13 @@
 # Asset rights and publication scope
 
-The local project includes a reference still and rendered MP4s from V7 through V11. They are derived from a previously generated/provided wallpaper image and are present in the user's local Obsidian archive. The available files do not establish a separate image license or the rights needed to grant unrestricted redistribution.
+The project owner has authorized public sharing of the project wallpaper media. The owner states that the V7 wallpaper was generated for this project through ChatGPT. OpenAI's current [Terms of Use](https://openai.com/policies/terms-of-use/) say that, as between the user and OpenAI and to the extent permitted by applicable law, users own Output; they also make the user responsible for having rights to any Input. This does not clear third-party material that may have been included in an input, guarantee exclusive copyright protection in every jurisdiction, or replace permissions required from another rights holder.
 
-For that reason this public-source repository excludes:
+The public GitHub Release wallpaper-media-v7-v11 contains:
 
-- the reference still (`wallpaper_reference.png`);
-- the V7–V11 MP4s and all frame extracts/thumbnails;
-- Lively's imported copies of those videos.
+- the V7 source MP4 and V8–V11 rendered MP4s;
+- the flattened reference still;
+- the available V9–V11 keyframe preview sheets.
 
-These files remain in the local archive and are ignored by Git. No release attachment is published. The MIT license applies only to source scripts and documentation in the repository. If the project owner later confirms permission to redistribute the visual source and derivative videos, add a separate media license/attribution statement and publish a release asset; do not imply that MIT covers those media files.
+These media are public for viewing and download with the project owner's authorization. They are not covered by the repository's MIT license, and no separate license for reuse, modification, redistribution, or commercial use is granted in this repository. The MIT license applies only to the included scripts and documentation.
+
+The video and image files are attached to a GitHub Release rather than committed to normal Git history. The Obsidian vault and local archive are not uploaded.
