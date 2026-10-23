@@ -23,7 +23,7 @@ def read_sky_median() -> np.ndarray:
     reader = imageio_ffmpeg.read_frames(SOURCE, pix_fmt="rgb24", bpp=3)
     metadata = next(reader)
     if metadata["size"] != (WIDTH, HEIGHT):
-        raise ValueError(f"Unexpected V9 dimensions: {metadata['size']}")
+        raise ValueError(f"V9 尺寸不符合预期 / Unexpected V9 dimensions: {metadata['size']}")
     frames = []
     try:
         for raw in reader:
@@ -33,12 +33,12 @@ def read_sky_median() -> np.ndarray:
     finally:
         reader.close()
     if len(frames) != round(metadata["duration"] * metadata["fps"]):
-        raise ValueError(f"Unexpected frame count: {len(frames)}")
+        raise ValueError(f"帧数不符合预期 / Unexpected frame count: {len(frames)}")
     return np.median(np.stack(frames, axis=0), axis=0).astype(np.uint8)
 
 
 def erase_meteor(frame: np.ndarray, median_sky: np.ndarray, t: float, event) -> bool:
-    """Erase a known V9 meteor footprint using a narrow, soft trajectory mask."""
+    """用窄而柔和的轨迹遮罩清除已知的 V9 流星痕迹。 / Erase a known V9 meteor footprint using a narrow, soft trajectory mask."""
     p = (t - event["start"]) / event["duration"]
     if p <= 0.0 or p >= 1.0:
         return False
@@ -104,6 +104,7 @@ def draw_meteor(frame: np.ndarray, t: float, event) -> None:
     across = (xx - hx) * px + (yy - hy) * py
     active = (along <= 0.0) & (along >= -tail_length)
 
+    # 细窄光线配合缓慢渐隐尾迹，不绘制放射状头部。
     # A narrow luminous line with a slowly fading tail; there is no radial head.
     rise = np.clip(p / 0.10, 0.0, 1.0)
     fall = np.clip((1.0 - p) / 0.19, 0.0, 1.0)
@@ -112,6 +113,7 @@ def draw_meteor(frame: np.ndarray, t: float, event) -> None:
     core = np.exp(-0.5 * (across / 0.67) ** 2)
     glow = np.exp(-0.5 * (across / 1.8) ** 2)
     line_alpha = (0.56 * core * tail_profile + 0.065 * glow * tail_profile) * envelope * active
+    # 尾端附近只有几像素渐亮并融入光线，不形成球状亮点。
     # The last few pixels blend brighter into the same line rather than forming a ball.
     line_alpha *= 0.78 + 0.22 * np.exp(along / 7.0)
 
@@ -126,19 +128,19 @@ def draw_meteor(frame: np.ndarray, t: float, event) -> None:
 
 def main() -> None:
     global SOURCE, OUTPUT
-    parser = argparse.ArgumentParser(description='Rebuild V10 meteor direction from V9')
-    parser.add_argument("--input", required=True, help="Input MP4 path")
-    parser.add_argument("--output", required=True, help="New MP4 output path (must not already exist)")
+    parser = argparse.ArgumentParser(description='从 V9 重建 V10 流星方向。 / Rebuild V10 meteor direction from V9.')
+    parser.add_argument("--input", required=True, help="输入 MP4 路径 / Input MP4 path")
+    parser.add_argument("--output", required=True, help="新 MP4 输出路径，文件必须不存在 / New MP4 output path; must not already exist")
     args = parser.parse_args()
     SOURCE = os.path.abspath(args.input)
     OUTPUT = os.path.abspath(args.output)
     if os.path.exists(OUTPUT):
-        raise FileExistsError(f"Refusing to overwrite existing output: {OUTPUT}")
+        raise FileExistsError(f"为保护现有文件，不会覆盖输出 / Refusing to overwrite existing output: {OUTPUT}")
     os.makedirs(os.path.dirname(OUTPUT), exist_ok=True)
     if not os.path.isfile(SOURCE):
-        raise FileNotFoundError(SOURCE)
+        raise FileNotFoundError(f"找不到输入视频 / Input video not found: {SOURCE}")
     if os.path.exists(OUTPUT):
-        raise FileExistsError(f"Refusing to overwrite an existing V10: {OUTPUT}")
+        raise FileExistsError(f"为保护现有 V10 文件，不会覆盖 / Refusing to overwrite an existing V10: {OUTPUT}")
 
     median_sky = read_sky_median()
     events = [
@@ -207,7 +209,7 @@ def main() -> None:
     finally:
         writer.close()
         reader.close()
-    print(f"Wrote {OUTPUT}; {source_index} frames at {OUTPUT_FPS:g} fps; cleared old V9 meteor tracks in {repaired_frames} source frames")
+    print(f"已写入 / Wrote {OUTPUT}；{source_index} 帧 / frames，{OUTPUT_FPS:g} fps；已在 {repaired_frames} 个源帧中清除旧 V9 轨迹 / cleared old V9 tracks from source frames")
 
 
 if __name__ == "__main__":

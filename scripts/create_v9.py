@@ -23,7 +23,7 @@ def read_sky_median() -> np.ndarray:
     reader = imageio_ffmpeg.read_frames(SOURCE, pix_fmt="rgb24", bpp=3)
     metadata = next(reader)
     if metadata["size"] != (WIDTH, HEIGHT):
-        raise ValueError(f"Unexpected V8 dimensions: {metadata['size']}")
+        raise ValueError(f"V8 尺寸不符合预期 / Unexpected V8 dimensions: {metadata['size']}")
     frames = []
     try:
         for raw in reader:
@@ -33,7 +33,7 @@ def read_sky_median() -> np.ndarray:
     finally:
         reader.close()
     if len(frames) != round(metadata["duration"] * metadata["fps"]):
-        raise ValueError(f"Unexpected frame count: {len(frames)}")
+        raise ValueError(f"帧数不符合预期 / Unexpected frame count: {len(frames)}")
     return np.median(np.stack(frames, axis=0), axis=0).astype(np.uint8)
 
 
@@ -57,7 +57,7 @@ def components8(mask: np.ndarray):
 
 
 def repair_old_meteor(frame: np.ndarray, median_sky: np.ndarray, frame_index: int) -> int:
-    """Replace only detected transient streak pixels with the temporal sky median."""
+    """仅用天空时间中值修补检测到的短暂流星像素。 / Replace only detected transient streak pixels with the temporal sky median."""
     current = frame[:SKY_HEIGHT].astype(np.int16)
     diff = np.abs(current - median_sky.astype(np.int16)).max(axis=2)
     luminance = current[:, :, 0] * 0.2126 + current[:, :, 1] * 0.7152 + current[:, :, 2] * 0.0722
@@ -81,7 +81,8 @@ def repair_old_meteor(frame: np.ndarray, median_sky: np.ndarray, frame_index: in
     for component in selected:
         for y, x in component:
             pixels[x, y] = 255
-    # Include the narrow codec halo; the repair stays on the measured line.
+    # 包含窄小的编码光晕；修补严格限制在测得的轨迹上。
+    # Include the narrow codec halo; keep the repair on the measured line.
     alpha = np.asarray(mask.filter(ImageFilter.MaxFilter(3)).filter(ImageFilter.GaussianBlur(0.55)), dtype=np.float32) / 255.0
     patch = frame[:SKY_HEIGHT].astype(np.float32)
     base = median_sky.astype(np.float32)
@@ -119,6 +120,7 @@ def draw_meteor(frame: np.ndarray, t: float, event) -> None:
     across = (xx - hx) * px + (yy - hy) * py
     active = (along <= 0.0) & (along >= -tail_length)
 
+    # 细窄光线配合缓慢渐隐尾迹，不绘制放射状头部。
     # A narrow luminous line with a slowly fading tail; there is no radial head.
     rise = np.clip(p / 0.10, 0.0, 1.0)
     fall = np.clip((1.0 - p) / 0.19, 0.0, 1.0)
@@ -127,6 +129,7 @@ def draw_meteor(frame: np.ndarray, t: float, event) -> None:
     core = np.exp(-0.5 * (across / 0.67) ** 2)
     glow = np.exp(-0.5 * (across / 1.8) ** 2)
     line_alpha = (0.56 * core * tail_profile + 0.065 * glow * tail_profile) * envelope * active
+    # 尾端附近只有几像素渐亮并融入光线，不形成球状亮点。
     # The last few pixels blend brighter into the same line rather than forming a ball.
     line_alpha *= 0.78 + 0.22 * np.exp(along / 7.0)
 
@@ -141,19 +144,19 @@ def draw_meteor(frame: np.ndarray, t: float, event) -> None:
 
 def main() -> None:
     global SOURCE, OUTPUT
-    parser = argparse.ArgumentParser(description='Rebuild V9 meteors from V8')
-    parser.add_argument("--input", required=True, help="Input MP4 path")
-    parser.add_argument("--output", required=True, help="New MP4 output path (must not already exist)")
+    parser = argparse.ArgumentParser(description='从 V8 重建 V9 流星。 / Rebuild V9 meteors from V8.')
+    parser.add_argument("--input", required=True, help="输入 MP4 路径 / Input MP4 path")
+    parser.add_argument("--output", required=True, help="新 MP4 输出路径，文件必须不存在 / New MP4 output path; must not already exist")
     args = parser.parse_args()
     SOURCE = os.path.abspath(args.input)
     OUTPUT = os.path.abspath(args.output)
     if os.path.exists(OUTPUT):
-        raise FileExistsError(f"Refusing to overwrite existing output: {OUTPUT}")
+        raise FileExistsError(f"为保护现有文件，不会覆盖输出 / Refusing to overwrite existing output: {OUTPUT}")
     os.makedirs(os.path.dirname(OUTPUT), exist_ok=True)
     if not os.path.isfile(SOURCE):
-        raise FileNotFoundError(SOURCE)
+        raise FileNotFoundError(f"找不到输入视频 / Input video not found: {SOURCE}")
     if os.path.exists(OUTPUT):
-        raise FileExistsError(f"Refusing to overwrite an existing V9: {OUTPUT}")
+        raise FileExistsError(f"为保护现有 V9 文件，不会覆盖 / Refusing to overwrite an existing V9: {OUTPUT}")
 
     median_sky = read_sky_median()
     events = [
@@ -206,7 +209,7 @@ def main() -> None:
     finally:
         writer.close()
         reader.close()
-    print(f"Wrote {OUTPUT}; {source_index * 2} frames at {OUTPUT_FPS:g} fps; repaired old streaks in {repaired_frames} source frames")
+    print(f"已写入 / Wrote {OUTPUT}；{source_index * 2} 帧 / frames，{OUTPUT_FPS:g} fps；已在 {repaired_frames} 个源帧中修补旧轨迹 / repaired old streaks in source frames")
 
 
 if __name__ == "__main__":
