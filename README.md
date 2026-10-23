@@ -43,7 +43,7 @@ Each script rejects an existing output path. Use a fresh name or output director
 
 ## Lively Wallpaper
 
-1. Download Starry_Lake_Wallpaper_V11.mp4 from the wallpaper media release, or build it locally from the supplied V7 source.
+1. Download Starry_Lake_Wallpaper_V11.mp4 from the [wallpaper media release](https://github.com/deguangtee1-oss/starry-lake-dynamic-wallpaper/releases/tag/wallpaper-media-v7-v11), or build it locally from the supplied V7 source.
 2. In Lively Wallpaper, choose **Add wallpaper** and select the MP4.
 3. Select the imported wallpaper and apply it to the desired display. Lively supports video looping; check scaling and monitor selection in Lively's controls.
 
@@ -55,5 +55,3 @@ The public repository is available at <https://github.com/deguangtee1-oss/starry
 ## License scope
 
 The MIT license in this repository applies to the included scripts and documentation only. No wallpaper image, video, extracted frame, thumbnail, or other visual asset is included or licensed here. See [asset rights](docs/asset-rights.md).
-
-
