@@ -1,0 +1,33 @@
+# Local media and user-provided source files
+*.mp4
+*.mov
+*.mkv
+*.webm
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.gif
+private_media/
+local_inputs/
+outputs/
+wallpapers/*.mp4
+wallpapers/*.mov
+wallpapers/*.mkv
+wallpapers/*.webm
+
+# Python/build caches
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# Local secrets and editor files
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.DS_Store
+Thumbs.db
