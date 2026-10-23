@@ -52,6 +52,7 @@ The media release is separate from the source-code repository history. See [asse
 ## Publication status
 
 The public repository is available at <https://github.com/deguangtee1-oss/starry-lake-dynamic-wallpaper>. Scripts and documentation are on the main branch; project videos and images are distributed as assets in the [wallpaper media release](https://github.com/deguangtee1-oss/starry-lake-dynamic-wallpaper/releases/tag/wallpaper-media-v7-v11). The project owner authorized public sharing. These visual assets are not covered by the MIT license.
+
 ## License scope
 
-The MIT license in this repository applies to the included scripts and documentation only. No wallpaper image, video, extracted frame, thumbnail, or other visual asset is included or licensed here. See [asset rights](docs/asset-rights.md).
+The MIT license in this repository applies to the included scripts and documentation only. Wallpaper videos and images attached to the public release are not covered by MIT or by a separate media license in this repository. See [asset rights](docs/asset-rights.md).
