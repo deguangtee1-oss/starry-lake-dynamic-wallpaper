@@ -51,7 +51,7 @@ No MP4 release is included while the image/media redistribution rights remain un
 
 ## Publication status
 
-The project is prepared locally for `deguangtee1-oss/starry-lake-dynamic-wallpaper`. The target has no publicly visible repository at the time of this check; GitHub CLI is not installed and no GitHub account is available through the configured Git credential helper, so the repository has not yet been created or pushed. An authenticated check is needed to rule out a private repository with the same name.
+The project is prepared locally for `deguangtee1-oss/starry-lake-dynamic-wallpaper`. The target has no publicly visible repository at the time of this check; GitHub CLI 2.103.0 is installed, but the official browser login has not been completed. No GitHub account is available through the configured Git Credential Manager. The repository has not yet been created or pushed. An authenticated check is needed to rule out a private repository with the same name.
 
 ## License scope
 
